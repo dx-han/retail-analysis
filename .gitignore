@@ -1,0 +1,30 @@
+# package
+build/
+dist/
+*.whl
+
+# cache
+.DS_Store
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# jupyter notebook
+.ipynb_checkpoints/
+notebook/
+*.ipynb
+start_notebook.sh
+
+# logs
+logs/
+*.og
+
+# local data
+data/
+test/
+*.p
+*.pdf
+*.doc
+*.docx
+*.xls
+*.xlsx

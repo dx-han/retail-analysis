@@ -1,0 +1,145 @@
+# -*- coding: utf-8 -*-
+import json
+import re
+import math
+
+
+def mapper(df_list, periods, last_date=None, nature_periods=[]):
+    users = {}
+
+    for order in df_list:
+        user_id = order['customer_id']
+        user = {}
+        diffday = order['diff_btw_first_this_order']
+
+        # if this line is the first order of this customer
+        if diffday == 0:
+            for k,v in order.items():
+                if re.compile('^first_+').findall(k):
+                    user[k] = v
+
+            user['first_order_date'] = order['format_order_date']
+            user['orders'] = {}
+            index = order['diff_btw_first_last_order']
+
+            for period in periods:
+                user['orders']['day_' + str(period)] = {}
+                time = math.ceil(index / day)
+
+                for i in range(time):
+                    user['orders']['day_' + str(period)][i] = 0
+            
+            if nature_periods != []:
+                first_order_date = user['first_order_date']
+                format_date = list(time.strptime(last_date, '%Y-%m-%d'))
+                last_date = format_date[0] * 10000 + format_date[1] * 100 + format_date[2]
+                months = diff_month(first_order_date, last_date)
+                for nature_period in nature_periods:
+                    for i in range(math.floor(months / nature_period) + 1):
+                        user['orders']['month_' + str(nature_period)][i] = 0
+
+            users[user_id] = user
+
+        if diffday > 0:
+            user = users[user_id]
+            for period in periods:
+                index = math.floor((diffday - 1) / period)
+                user['orders']['day_' + str(day)][index] = 1  # map最关键的一步！记1的操作
+            
+            if nature_periods != []:
+                first_order_date = user['first_order_date']
+                format_order_date = order['format_order_date']
+                months = diff_month(first_order_date, format_order_date)
+                for nature_period in nature_periods:
+                    user['orders']['month_' + str(nature_period)][math.floor(months / nature_period)] = 1
+
+            users[user_id] = user
+
+    df = []
+    for k, v in users.items():
+        v['customer_id'] = k
+        month = int(v['first_order_date']/100)
+        m = {'month': month}
+        orders = v['orders']
+        del v['first_order_date']
+        del v['orders']
+        del v['customer_id']
+        all = dict(m, **v, **orders)
+        df.append(all)
+    
+    return df
+
+
+def diff_month(day1, day2):
+    month1 = int(day1 / 100 % 100)
+    year1 = int(day1 / 10000)
+    month2 = int(day2 / 100 % 100)
+    year2 = int(day2 / 10000)
+    return (year2 - year1) * 12 + (month2 - month1)
+
+
+def reducer(df_list, dimensions, periods, nature_periods=[]):
+    df = pd.DataFrame(df_list)
+    all_periods = ['day_' + i for i in periods] + ['month_' + i for i in nature_periods]
+
+    if len(all_periods) == 1:
+        df = df.groupby(dimensions + ['month']).agg({
+            all_periods[0]: [list, len]
+        }).reset_index()
+    else:
+        tmp_map_groupby = {}
+        tmp_map_groupby[all_periods[0]] = [list, len]
+        for period in all_periods[1:]:
+            tmp_map_groupby[period] = list
+        df = df.groupby(dimensions + ['month']).agg(tmp_map_groupby).reset_index()
+
+    df.columns = [''.join(x) for x in df.columns.ravel()]
+    tmp_map_rename = {}
+    for i in df.columns.to_list():
+        if 'list' in i:
+            tmp_map_rename[i] = re.sub('(list|len)', '', i)
+        elif 'len' in i:
+            tmp_map_rename[i] = 'total'
+        else:
+            continue
+    df.rename(columns=tmp_map_rename, inplace=True)
+
+    # 权宜之计
+    # def reduce(x):
+    #     d = {}
+    #     length = 0
+    #     for i in range(len(x)):
+    #         tmp_length = len(x[i])
+    #         if tmp_length > length:
+    #             length = tmp_length
+    #     for i in range(length):
+    #         d[str(i)] = 0
+    #     for i in range(len(x)):
+    #         for k, v in x[i].items():
+    #             if k in d:
+    #                 d[k] += v
+    #             else:
+    #                 continue
+    #     return d
+    
+    # 可能报错
+    def reduce(x):
+        d = {}
+        length = 0
+        for i in range(len(x)):
+            tmp_length = len(x[i])
+            if tmp_length > length:
+                length = tmp_length
+        for i in range(length):
+            d[str(i)] = 0
+
+        for i in range(len(x)):
+            for k, v in x[i].items():
+                d[k] += v
+        return d
+    
+    for period in all_periods:
+        df[period] = df[period].apply(lambda x: reduce(x))
+    return df
+    # dt.to_json('output.json', orient='records', lines=True, force_ascii=False)
+
