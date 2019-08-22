@@ -108,25 +108,6 @@ def reducer(df_list, dimensions, periods, nature_periods=[]):
 
     df.rename(columns=tmp_map_rename, inplace=True)
 
-    # 权宜之计
-    # def reduce(x):
-    #     d = {}
-    #     length = 0
-    #     for i in range(len(x)):
-    #         tmp_length = len(x[i])
-    #         if tmp_length > length:
-    #             length = tmp_length
-    #     for i in range(length):
-    #         d[str(i)] = 0
-    #     for i in range(len(x)):
-    #         for k, v in x[i].items():
-    #             if k in d:
-    #                 d[k] += v
-    #             else:
-    #                 continue
-    #     return d
-
-    # 可能报错
     def reduce(x):
         d = {}
         length = 0

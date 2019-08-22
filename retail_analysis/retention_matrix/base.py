@@ -16,4 +16,3 @@ class MapReduce(object):
         df_mapper = mapper(self.df, self.periods, self.last_date, self.nature_periods)
         df_reducer = reducer(df_mapper, self.dimensions, self.periods, self.nature_periods)
         return df_reducer
-
