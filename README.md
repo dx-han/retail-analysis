@@ -14,7 +14,7 @@ Input Requirements
 Attention
 
 - The format of txn_date must be Year-Month-Day (%Y-%m-%d) without any information about hour, minute, and second
-- The prefix of each customer_id must be 'id'. For example, if the input of customer id for the 1st row is '1200', an error will be raised. Instead, 'id1200' is accepted.
+- I highly recommend adding 'ID' in front of each customer_id. For some automatically-convenient reasons, pandas will read number as int/float even though they are stored as string in the csv file. To ensure the format of customer_id is string, adding 'ID' will be safe and no error will be caused during the calculation.
 
 Structure of Input
 
