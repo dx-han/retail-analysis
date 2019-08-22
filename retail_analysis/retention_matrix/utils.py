@@ -4,9 +4,10 @@ import time
 import numpy as np
 import pandas as pd
 import re
+import datetime
 
 
-def stack_data(df, last_date):
+def stack_data(df):
     """Add first-txn-based and selectively multidimensional info to each txn record.
 
     Arguments:
@@ -18,9 +19,11 @@ def stack_data(df, last_date):
     """
 
     _columns = df.columns.to_list()
-    _must_columns = ['txn_id', 'customer_id', 'txn_date']
+    _must_columns = ['customer_id', 'txn_date']
     dimensions = [i for i in _columns if i not in _must_columns]
     last_date = df['txn_date'].max()
+    # last_date = datetime.datetime.strftime(
+    #     datetime.datetime.strptime(df['txn_date'].max(), '%Y-%m-%d') + datetime.timedelta(32), '%Y-%m-%d')
     df.sort_values(by=['txn_date'], ascending=True, inplace=True)
     df_list = df.to_dict(orient = 'records')
     first_orders = {}
