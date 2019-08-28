@@ -18,7 +18,7 @@ def stack_data(df):
         A map where key is customer_id, value is 
     """
 
-    _columns = df.columns.to_list()
+    _columns = df.columns.tolist()
     _must_columns = ['customer_id', 'txn_date']
     dimensions = [i for i in _columns if i not in _must_columns]
     last_date = df['txn_date'].max()

@@ -27,5 +27,4 @@ Usage
 ```
 python run.py --filename data/test --periods 30,60,90 --nature-periods 1,2,3
 ```
-where *periods* means days, *nature-periods* means nature months
-
+where *data/test* means a csv file named test located in a relative-position folder called data, *periods* means the length of intervals by days, *nature-periods* means the length of intervals by nature months.

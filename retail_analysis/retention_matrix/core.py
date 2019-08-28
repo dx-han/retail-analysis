@@ -98,7 +98,7 @@ def reducer(df_list, dimensions, periods, nature_periods=[]):
     df.columns = [''.join(x) for x in df.columns.ravel()]
     tmp_map_rename = {}
 
-    for i in df.columns.to_list():
+    for i in df.columns.tolist():
         if 'list' in i:
             tmp_map_rename[i] = re.sub('(list|len)', '', i)
         elif 'len' in i:

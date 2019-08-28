@@ -23,4 +23,4 @@ if __name__ == '__main__':
     orders, dimensions, last_date = stack_data(df)
     mp = MapReduce(df=orders, periods=periods, dimensions=dimensions, last_date=last_date, nature_periods=nature)
     df_reducer = mp.get_map_reduce_result()
-    df_reducer.to_csv('df_reducer_'+str(int(time.time())), index=False, encoding='utf_8_sig')
+    df_reducer.to_csv('df_reducer_'+str(int(time.time()))+'.csv', index=False, encoding='utf_8_sig')
