@@ -24,7 +24,11 @@ Structure of Input
 | ... | ... | ... |
 
 Usage
-```
+``` Python
+# 其中data/test表示为在根目录的data文件夹下（若没有请新建data文件夹存有名为test.csv的文件
 python run.py --filename data/test --periods 30,60,90 --nature-periods 1,2,3
+
+# 其中test表示为在根目录存有名为test.csv的文件
+python run.py --filename test --periods 30,60,90 --nature-periods 1,2,3
 ```
 where *data/test* means a csv file named test located in a relative-position folder called data, *periods* means the length of intervals by days, *nature-periods* means the length of intervals by nature months.
